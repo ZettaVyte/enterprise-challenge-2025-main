@@ -1,0 +1,10 @@
+# Ignorar dados brutos e gerados
+data/df_t.csv
+data/clientes_segmentados_rfm.csv
+
+# Ignorar pastas de ambiente virtual
+venv/
+__pycache__/
+
+# Ignorar arquivos de sistema
+.DS_Store
