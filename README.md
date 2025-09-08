@@ -1,6 +1,15 @@
 # NexTripAI - Análise Preditiva de Clientes
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://dashboard-clickbus.streamlit.app/)
+
 Este projeto contém uma solução de ponta a ponta de Ciência de Dados para a ClickBus, focada em entender e prever o comportamento dos clientes. A solução inclui segmentação de clientes, previsão de próxima compra e um dashboard interativo para visualização dos resultados.
+
+## 🚀 Demonstração Ao Vivo (Live Demo)
+
+O dashboard interativo deste projeto está disponível publicamente e pode ser acessado através do link abaixo:
+
+**[https://dashboard-clickbus.streamlit.app/](https://dashboard-clickbus.streamlit.app/)**
+
 ---
 
 ## Dados do Projeto
