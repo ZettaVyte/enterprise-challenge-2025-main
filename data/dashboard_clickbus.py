@@ -175,6 +175,67 @@ with tab2:
     **Este modelo é ideal para campanhas de marketing de baixo custo e grande escala (ex: e-mail marketing).** Ele nos permite focar em um grupo muito mais qualificado de clientes, maximizando o alcance e o retorno sobre o investimento.
     """)
 
+# --- ABA 3: PREVISÃO DE PRÓXIMA ROTA ---
+with tab3:
+    st.header("Previsão do Próximo Trecho de Viagem")
+    st.markdown("""
+    O objetivo aqui é prever qual será a **próxima rota** que um cliente irá comprar. Comparamos um modelo simples (baseline) com um modelo avançado de Machine Learning.
+    """)
+
+    # --- Lógica do Modelo (em cache para performance) ---
+    @st.cache_resource
+    def train_route_model(df):
+        df_sorted = df.sort_values(by=['fk_contact', 'datetime_purchase'])
+        df_sorted['last_route'] = df_sorted.groupby('fk_contact')['target_route'].shift(1)
+        df_predict = df_sorted.dropna(subset=['last_route'])
+        
+        X = df_predict[['last_route']]
+        y = df_predict['target_route']
+        
+        le = LabelEncoder()
+        X['last_route_encoded'] = le.fit_transform(X['last_route'])
+        X = X.drop('last_route', axis=1)
+        
+        model = RandomForestClassifier(n_estimators=100, random_state=42, max_depth=10, n_jobs=-1)
+        model.fit(X, y)
+        return model, le
+
+    rf_route_model, route_encoder = train_route_model(df_processed)
+
+    st.subheader("Comparação de Performance dos Modelos")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric(label="**Baseline (Prever a Rota Mais Frequente)**", value="24.02%")
+    with col2:
+        st.metric(label="**Modelo RandomForest (Prevê Top 50 Rotas)**", value="78.75%", delta="54.73%")
+    st.success("O modelo RandomForest é **3.3x mais preciso** que o baseline.")
+
+    st.subheader("Teste o Modelo de Previsão de Rota")
+    multi_purchase_clients = df_processed['fk_contact'].value_counts()[df_processed['fk_contact'].value_counts() > 1].index
+    sample_client = st.selectbox("Selecione um cliente para testar:", options=multi_purchase_clients)
+    
+    if sample_client:
+        client_history = df_processed[df_processed['fk_contact'] == sample_client].sort_values('datetime_purchase')
+        last_route_real = client_history['route'].iloc[-1]
+        
+        if len(client_history) > 1:
+            last_route_for_prediction = client_history['target_route'].iloc[-2]
+            
+            last_route_encoded = route_encoder.transform([last_route_for_prediction])
+            prediction = rf_route_model.predict([[last_route_encoded[0]]])
+            
+            st.write(f"**Histórico do Cliente:** A penúltima rota foi **{last_route_for_prediction}**.")
+            st.write(f"➡️ **Previsão do Modelo para a Próxima Rota:** **{prediction[0]}**")
+            st.write(f"🎯 **Rota Real da Última Viagem:** **{last_route_real}**")
+            
+            if prediction[0] == last_route_real or (prediction[0] == 'Outra' and last_route_real not in top_routes_global):
+                st.success("O modelo acertou a previsão!")
+            else:
+                st.warning("O modelo não acertou a previsão.")
+        else:
+            st.write("Este cliente tem apenas uma compra, não é possível prever a próxima rota com base no histórico.")
+       
+
 st.sidebar.header("Sobre o Projeto")
 st.sidebar.info("""
 Este dashboard é o resultado de uma análise de dados completa para a ClickBus, cobrindo desde a segmentação de clientes até a criação de modelos preditivos avançados.
