@@ -108,59 +108,8 @@ with tab1:
         )
         st.plotly_chart(fig_bar, use_container_width=True)
 
-# --- ABA 2: PREVISÃO DE PRÓXIMA ROTA ---
+# --- ABA 2: PREVISÃO DE RECOMPRA ---
 with tab2:
-    st.header("Previsão do Próximo Trecho de Viagem")
-    st.markdown("Este modelo prevê qual será a próxima rota que um cliente irá comprar.")
-    
-    @st.cache_resource
-    def train_route_model(df):
-        df_sorted = df.sort_values(by=['fk_contact', 'datetime_purchase'])
-        df_sorted['last_route'] = df_sorted.groupby('fk_contact')['target_route'].shift(1)
-        df_predict = df_sorted.dropna(subset=['last_route'])
-        
-        X = df_predict[['last_route']]
-        y = df_predict['target_route']
-        
-        le = LabelEncoder()
-        X['last_route_encoded'] = le.fit_transform(X['last_route'])
-        X = X.drop('last_route', axis=1)
-        
-        model = RandomForestClassifier(n_estimators=100, random_state=42, max_depth=10, n_jobs=-1)
-        model.fit(X, y)
-        return model, le
-
-    rf_route_model, route_encoder = train_route_model(df_processed)
-
-    st.subheader("Comparação de Performance dos Modelos")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric(label="**Baseline (Rota Mais Frequente)**", value="24.02%")
-    with col2:
-        st.metric(label="**Modelo RandomForest**", value="78.75%", delta="54.73%")
-    st.success("O modelo RandomForest é **3.3x mais preciso** que o baseline.")
-
-    st.subheader("Teste o Modelo de Previsão de Rota")
-    multi_purchase_clients = df_processed['fk_contact'].value_counts()[df_processed['fk_contact'].value_counts() > 1].index
-    sample_client = st.selectbox("Selecione um cliente para testar:", options=multi_purchase_clients)
-    
-    if sample_client:
-        client_history = df_processed[df_processed['fk_contact'] == sample_client].sort_values('datetime_purchase')
-        last_route_real = client_history['route'].iloc[-1]
-        
-        if len(client_history) > 1:
-            last_route_for_prediction = client_history['target_route'].iloc[-2]
-            last_route_encoded = route_encoder.transform([last_route_for_prediction])
-            prediction = rf_route_model.predict([[last_route_encoded[0]]])
-            
-            st.write(f"**Histórico:** A penúltima rota foi **{last_route_for_prediction}**.")
-            st.write(f"➡️ **Previsão do Modelo:** **{prediction[0]}**")
-            st.write(f"🎯 **Próxima Rota Real:** **{last_route_real}**")
-        else:
-            st.write("Cliente com apenas uma compra. Não é possível prever a próxima.")
-
-# --- ABA 3: PREVISÃO DE RECOMPRA ---
-with tab3:
     st.header("Previsão de Recompra nos Próximos 30 Dias")
     st.markdown("Este modelo identifica clientes com maior probabilidade de realizar uma nova compra no próximo mês.")
 
@@ -210,6 +159,57 @@ with tab3:
                 gauge = {'axis': {'range': [1, 10]}, 'bar': {'color': "green"}}
             ))
             st.plotly_chart(fig_lift, use_container_width=True)
+
+# --- ABA 3: PREVISÃO DE PRÓXIMA ROTA ---
+with tab3:
+    st.header("Previsão do Próximo Trecho de Viagem")
+    st.markdown("Este modelo prevê qual será a próxima rota que um cliente irá comprar.")
+    
+    @st.cache_resource
+    def train_route_model(df):
+        df_sorted = df.sort_values(by=['fk_contact', 'datetime_purchase'])
+        df_sorted['last_route'] = df_sorted.groupby('fk_contact')['target_route'].shift(1)
+        df_predict = df_sorted.dropna(subset=['last_route'])
+        
+        X = df_predict[['last_route']]
+        y = df_predict['target_route']
+        
+        le = LabelEncoder()
+        X['last_route_encoded'] = le.fit_transform(X['last_route'])
+        X = X.drop('last_route', axis=1)
+        
+        model = RandomForestClassifier(n_estimators=100, random_state=42, max_depth=10, n_jobs=-1)
+        model.fit(X, y)
+        return model, le
+
+    rf_route_model, route_encoder = train_route_model(df_processed)
+
+    st.subheader("Comparação de Performance dos Modelos")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric(label="**Baseline (Rota Mais Frequente)**", value="24.02%")
+    with col2:
+        st.metric(label="**Modelo RandomForest**", value="78.75%", delta="54.73%")
+    st.success("O modelo RandomForest é **3.3x mais preciso** que o baseline.")
+
+    st.subheader("Teste o Modelo de Previsão de Rota")
+    multi_purchase_clients = df_processed['fk_contact'].value_counts()[df_processed['fk_contact'].value_counts() > 1].index
+    sample_client = st.selectbox("Selecione um cliente para testar:", options=multi_purchase_clients)
+    
+    if sample_client:
+        client_history = df_processed[df_processed['fk_contact'] == sample_client].sort_values('datetime_purchase')
+        last_route_real = client_history['route'].iloc[-1]
+        
+        if len(client_history) > 1:
+            last_route_for_prediction = client_history['target_route'].iloc[-2]
+            last_route_encoded = route_encoder.transform([last_route_for_prediction])
+            prediction = rf_route_model.predict([[last_route_encoded[0]]])
+            
+            st.write(f"**Histórico:** A penúltima rota foi **{last_route_for_prediction}**.")
+            st.write(f"➡️ **Previsão do Modelo:** **{prediction[0]}**")
+            st.write(f"🎯 **Próxima Rota Real:** **{last_route_real}**")
+        else:
+            st.write("Cliente com apenas uma compra. Não é possível prever a próxima.")
 
 st.sidebar.header("Sobre o Projeto")
 st.sidebar.info("Dashboard interativo que apresenta os resultados dos modelos de segmentação e previsão de comportamento de clientes da ClickBus.")
