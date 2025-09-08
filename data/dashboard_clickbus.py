@@ -99,7 +99,7 @@ with tab1:
         st.plotly_chart(fig_scatter, use_container_width=True)
     with col2:
         fig_bar = px.bar(
-            cluster_analysis.sort_values('MonetaryValue'), x='MonovoletaryValue', y='Persona', orientation='h',
+            cluster_analysis.sort_values('MonetaryValue'), x='MonetaryValue', y='Persona', orientation='h',
             color='Persona', title='Valor Monetário Médio por Segmento', labels={'MonetaryValue': 'Valor Médio (R$)', 'Persona': 'Segmento'}
         )
         st.plotly_chart(fig_bar, use_container_width=True)
