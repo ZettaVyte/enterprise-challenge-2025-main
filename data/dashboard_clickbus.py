@@ -69,8 +69,9 @@ st.markdown("Este dashboard apresenta os resultados dos três principais desafio
 
 tab1, tab2, tab3 = st.tabs([
     "🎯 **1. Segmentação de Clientes**",
-    "🗺️ **2. Previsão de Próxima Rota**",
-    "📈 **3. Previsão de Recompra**"
+    "📈 **2. Previsão de Recompra**",
+    "🗺️ **3. Previsão de Próxima Rota**"
+    
 ])
 
 # --- ABA 1: SEGMENTAÇÃO DE CLIENTES ---
