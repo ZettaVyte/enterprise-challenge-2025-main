@@ -52,7 +52,7 @@ def generate_segmented_data(_df):
 
 # --- Carregamento e Preparação Global dos Dados ---
 try:
-    df_processed = load_and_process_data('data/df_amostra_reduzido.csv')
+    df_processed = load_and_process_data('data/df_amostra.csv')
     df_segmented = generate_segmented_data(df_processed)
     
     # Criar a coluna 'target_route' no escopo global para estar disponível em todo o app
@@ -60,7 +60,7 @@ try:
     df_processed['target_route'] = df_processed['route'].apply(lambda x: x if x in top_routes_global else 'Outra')
 
 except FileNotFoundError:
-    st.error("Erro: Arquivo 'data/df_amostra_reduzido.csv' não encontrado. Certifique-se de que a amostra de dados está no seu repositório GitHub.")
+    st.error("Erro: Arquivo 'data/df_amostra.csv' não encontrado. Certifique-se de que a amostra de dados está no seu repositório GitHub.")
     st.stop()
 
 # --- Título do Dashboard ---
