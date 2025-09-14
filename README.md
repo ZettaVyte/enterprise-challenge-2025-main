@@ -56,6 +56,8 @@ A arquitetura deste protótipo é focada em um fluxo de trabalho local, separand
 |   |-- modelo_proxima_rota.joblib
 |   |-- encoder_proxima_rota.joblib
 |
+|-- Arquitetura_NexTrip_AI.jpg # Imagem da Arquitetura da Solução
+|-- amostra.py             #Script usado para criar a amostra a partir do .csv original.
 |-- main.py                # Script principal para treinar e salvar todos os modelos
 |-- dashboard_clickbus.py    # Script para executar o dashboard interativo
 |-- requirements.txt       # Lista de dependências do projeto
@@ -94,7 +96,7 @@ pip install -r requirements.txt
 ```
 
 ### 5. Adicione os Dados
-Coloque o arquivo `df_t.csv` dentro da pasta `data/`.
+Utilize o arquivo `df_amostra.csv` dentro da pasta `data/`.
 
 ### 6. Treine os Modelos
 Execute o script `main.py` para processar os dados e treinar todos os modelos. Os artefatos serão salvos nas pastas `data/` e `models/`.
@@ -105,6 +107,8 @@ python main.py
 ### 7. Execute o Dashboard
 Após o treinamento, inicie o dashboard interativo com o Streamlit.
 ```bash
+cd data;
 streamlit run dashboard_clickbus.py
 ```
 Uma nova aba abrirá em seu navegador com a aplicação web.
+Aproveite!
