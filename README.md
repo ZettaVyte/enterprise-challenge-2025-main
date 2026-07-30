@@ -74,7 +74,7 @@ Siga os passos abaixo para configurar e executar a solução em sua máquina loc
 
 ### 2. Clone o Repositório
 ```bash
-git clone <URL_DO_SEU_REPOSITORIO>
+git clone <(https://github.com/ZettaVyte/enterprise-challenge-2025-main)>
 cd projeto_clickbus
 ```
 
